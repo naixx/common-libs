@@ -1,0 +1,59 @@
+package common.analytics
+
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
+
+annotation class Param(val value: String)
+
+typealias AnalyticsCall = (name: String, parameterNames: List<String>, args: List<Any>) -> Unit
+typealias AnalyticsConverter = (Any) -> Any
+
+@PublishedApi
+internal var analyticsConverter: AnalyticsConverter = { it }
+
+inline fun <reified T> createAdapter(noinline analyticsCall: AnalyticsCall) = createAdapter(T::class.java, analyticsCall)
+
+@PublishedApi
+internal fun <T> createAdapter(impl: Class<T>, analyticsCall: AnalyticsCall): T {
+    val serviceMethodCache = ConcurrentHashMap<Method, CallableMethod>()
+    return Proxy.newProxyInstance(impl.classLoader, arrayOf(impl)) { _: Any?, method: Method, args: Array<out Any>? ->
+        val a: Array<out Any>? =
+            if (args != null)
+                args.map(analyticsConverter).toTypedArray()
+            else null
+        val def = tryDefault(impl, method)
+        if (def != null)
+            return@newProxyInstance if (args != null)
+                def.invoke(null, null, *args)
+            else def.invoke(null, null)
+
+        val callableMethod = serviceMethodCache.getOrPut(method) {
+            val parameters = method.parameterAnnotations.flatMap { it.filterIsInstance(Param::class.java).map { it.value } }
+            CallableMethod(method.name, parameters)
+        }
+        analyticsCall.invoke(callableMethod.name, callableMethod.parameterNames, a.orEmpty().toList())
+        null
+    } as T
+}
+
+inline fun <reified T> createAggregate(vararg impls: T, noinline converter: AnalyticsConverter = { it }): T {
+    analyticsConverter = converter
+    return Proxy.newProxyInstance(T::class.java.classLoader, arrayOf(T::class.java)) { _: Any?, method: Method, args: Array<out Any>? ->
+        impls.forEach {
+            if (args != null)
+                method.invoke(it, *args)
+            else
+                method.invoke(it)
+        }
+        null
+    } as T
+}
+
+private fun tryDefault(impl: Class<*>, method: Method): Method? =
+    impl
+        .declaredClasses.filter { it.name.contains("DefaultImpls") }
+        .flatMap { it.declaredMethods.toList() }
+        .firstOrNull { it.name == method.name && it.parameterTypes.drop(1).toTypedArray().contentEquals(method.parameterTypes) }
+
+private data class CallableMethod(val name: String, val parameterNames: List<String>)

@@ -1,0 +1,8 @@
+rootProject.name = "com.github.naixx.common-libs"
+
+include ':adapters'
+include ':analytics'
+include ':common'
+include ':databinding'
+include ':dialogs'
+include ':logger'

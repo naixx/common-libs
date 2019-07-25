@@ -1,0 +1,22 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+        defaultPublishConfig 'release'
+    }
+    buildTypes {
+        staging {}
+    }
+}
+
+dependencies {
+    api 'com.jakewharton.timber:timber:2.2.2'
+    compileOnly 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+}
+
+apply from: "$rootDir/publish.gradle"

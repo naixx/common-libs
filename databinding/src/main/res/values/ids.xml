@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<item name="picasso" type="id" />-->
+    <!--<item name="ic_notification" type="id" />-->
+    <!--<item name="badge" type="id" />-->
+    <item name="keyListener" type="id" />
+</resources>
