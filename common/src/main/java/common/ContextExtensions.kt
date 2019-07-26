@@ -13,7 +13,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 
-val errorLogger: ((Throwable?) -> Unit)? = null
+var errorLogger: ((Throwable?) -> Unit)? = null
 
 inline fun Context.handleError(): (Throwable) -> Unit = {
     errorLogger?.invoke(it)
