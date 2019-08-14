@@ -12,6 +12,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
 var errorLogger: ((Throwable?) -> Unit)? = null
 
@@ -49,6 +50,14 @@ inline fun <reified T : Activity> Activity.startActivity(
     block: Intent.() -> Unit = {}
 ) {
     startActivityForResult(Intent(this, T::class.java).apply { block() }, requestCode, options)
+}
+
+inline fun <reified T : Activity> Fragment.startActivity(
+    requestCode: Int = -1,
+    options: Bundle? = null,
+    block: Intent.() -> Unit = {}
+) {
+    startActivityForResult(Intent(this.context, T::class.java).apply { block() }, requestCode, options)
 }
 
 inline fun <reified T : Activity> Activity.startActivityWithoutAnimation(
