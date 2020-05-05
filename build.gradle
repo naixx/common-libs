@@ -9,16 +9,36 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.android.tools.build:gradle:$androidGradlePlugin"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.28.0'
     }
 }
 
 allprojects {
     repositories {
-		mavenCentral()
+        mavenCentral()
         google()
         jcenter()
-		maven { url "https://jitpack.io" }
+        maven { url "https://jitpack.io" }
     }
 }
 
 group = 'com.github.naixx.common-libs'
+
+task wrapped(type: Wrapper) {
+    gradleVersion = '6.4'
+}
+
+apply plugin: 'com.github.ben-manes.versions'
+
+dependencyUpdates.resolutionStrategy {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}

@@ -21,20 +21,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.transition:transition:1.1.0'
 
-    //implementation rxjava
+    compileOnly "io.reactivex:rxjava:$rxjava"
+    compileOnly "io.reactivex:rxandroid:1.2.1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    testImplementation "androidx.test:core:1.2.0"
+    testImplementation 'junit:junit:4.13'
+    testImplementation "org.robolectric:robolectric:4.3.1"
 }
 
 apply from: "$rootDir/publish.gradle"
