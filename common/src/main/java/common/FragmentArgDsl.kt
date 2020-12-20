@@ -7,6 +7,7 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import java.io.Serializable
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
 import kotlin.reflect.KProperty1
 
 open class FragmentArg<T>(
@@ -27,12 +28,13 @@ inline fun Fragment.int(defValue: Int = 0) = FragmentArg({ getInt(it, defValue) 
 inline fun Fragment.boolean(defValue: Boolean = false) = FragmentArg({ getBoolean(it, defValue) }, { name, value -> this.putBoolean(name, value) })
 inline fun <T : Serializable?> Fragment.string(defValue: String? = null) = FragmentArg({ getString(it, defValue) }, { name, value -> this.putString(name, value) })
 
-inline fun <T : Fragment> T.arguments(block: FragmentArgDsl.() -> Unit) = this.apply {
-    arguments = FragmentArgDsl(Bundle()).apply(block).bundle
+inline fun <T : Fragment> T.arguments(block: FragmentArgDsl.(T) -> Unit) = this.apply {
+    arguments = FragmentArgDsl(Bundle()).apply { block(this@arguments) }.bundle
 }
 
 class FragmentArgDsl(val bundle: Bundle) {
-    operator fun <F : Fragment, T> KProperty1<F, T?>.plusAssign(value: T) {
+
+    inline operator fun <reified T> KProperty0<T?>.plusAssign(value: T) {
         when (value) {
             is Parcelable   -> bundle.putParcelable(name, value)
             is Serializable -> bundle.putSerializable(name, value)
