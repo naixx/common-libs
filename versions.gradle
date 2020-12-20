@@ -1,7 +1,7 @@
 ext {
     version = "0.1.8"
 
-    androidGradlePlugin = '3.5.3'
+    androidGradlePlugin = '4.2.0-beta02'
     compileSdkVersion = 28
     minSdkVersion = 21
     targetSdkVersion = 28

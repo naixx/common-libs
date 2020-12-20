@@ -4,9 +4,7 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    dataBinding {
-        enabled = true
-    }
+    buildFeatures.dataBinding = true
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
