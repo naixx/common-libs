@@ -30,15 +30,15 @@ abstract class SimpleListAdapter<T, B : ViewBinding>(
 }
 
 /**
- * A convenience adapter for simple bindings
+ * A convenience adapter for simple inline bindings
  */
 open class SimpleListAdapter2<T, V : ViewBinding>(
         bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> V,
-        val onBind2: V.(item: T, position: Int) -> Unit,
-        diffCallback: DiffUtil.ItemCallback<T?> = SimpleDiffCallback()
+        diffCallback: DiffUtil.ItemCallback<T?> = SimpleDiffCallback(),
+        val onBind: V.(item: T, position: Int) -> Unit
 ) : SimpleListAdapter<T, V>(bindingInflater, diffCallback) {
 
     override fun onBind(item: T, binding: V, position: Int) {
-        binding.onBind2(item, position)
+        binding.onBind(item, position)
     }
 }
