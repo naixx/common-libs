@@ -16,10 +16,10 @@ open class FragmentArg<T>(
 ) {
 
     operator fun getValue(fragment: Fragment, property: KProperty<*>): T =
-            fragment.arguments!!.getter(property.name)
+            fragment.requireArguments().getter(property.name)
 
     operator fun setValue(fragment: Fragment, property: KProperty<*>, value: T) =
-            fragment.arguments!!.setter(property.name, value)
+            fragment.requireArguments().setter(property.name, value)
 }
 
 inline fun <T : Serializable?> Fragment.serializable() = FragmentArg({ getSerializable(it) as T }, { name, value -> this.putSerializable(name, value) })

@@ -40,7 +40,7 @@ interface RxObserveDsl : LifecycleOwner {
     fun <T> Observable<T>.observe(onNext: (T) -> Unit = {}): Subscription = observe(onNext, *emptyArray())
 
     /**
-     * A convenience method to show toasts for backend api error codes
+     * A convenience method to show toasts for backend api error codes. Does not respect fragment's view lifecycle
      */
     fun <T> Observable<T>.observe(onNext: (T) -> Unit = {}, vararg apiErrors: Pair<Int, Int>): Subscription {
         val subscription = this
