@@ -1,5 +1,5 @@
 apply plugin: 'kotlin'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -7,3 +7,13 @@ dependencies {
 }
 
 version = rootProject.ext.version
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            version = rootProject.ext.version
+
+            from components.java
+        }
+    }
+}
