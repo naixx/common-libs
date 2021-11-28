@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="common.extras">
+
+    <application>
+        <activity android:name="common.extras.TestActivity" android:exported="true"/>
+    </application>
+
+</manifest>

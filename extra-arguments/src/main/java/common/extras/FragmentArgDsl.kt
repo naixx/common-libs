@@ -1,6 +1,5 @@
 @file:Suppress("NOTHING_TO_INLINE")
-
-package common
+package common.extras
 
 import android.os.Bundle
 import android.os.Parcelable
