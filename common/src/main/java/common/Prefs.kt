@@ -44,10 +44,10 @@ abstract class PrefsDsl(private val name_: String? = null) {
             PrefPrimitiveDelegate(key, defaultValue, SharedPreferences::getFloat, SharedPreferences.Editor::putFloat)
 
     fun PrefsDsl.string(defaultValue: String = "", key: String? = null): ReadWriteProperty<PrefsDsl, String> =
-            PrefPrimitiveDelegate(key, defaultValue, SharedPreferences::getString, SharedPreferences.Editor::putString)
+            PrefPrimitiveDelegate(key, defaultValue, { key, defValue -> getString(key, defValue) ?: defaultValue }, SharedPreferences.Editor::putString)
 
     fun PrefsDsl.stringSet(defaultValue: Set<String> = emptySet(), key: String? = null): ReadWriteProperty<PrefsDsl, Set<String>> =
-            PrefPrimitiveDelegate(key, defaultValue, SharedPreferences::getStringSet, SharedPreferences.Editor::putStringSet)
+            PrefPrimitiveDelegate(key, defaultValue, { key, defValues -> getStringSet(key, defValues) ?: defaultValue }, SharedPreferences.Editor::putStringSet)
 
     inline fun <reified E : Enum<E>> PrefsDsl.enum(defaultValue: E, key: String? = null): ReadWriteProperty<PrefsDsl, E> =
             PrefPrimitiveDelegate(
