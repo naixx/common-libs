@@ -17,6 +17,7 @@
 
 package common.analytics
 
+import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.concurrent.ConcurrentHashMap
@@ -34,24 +35,23 @@ inline fun <reified T> createAdapter(noinline analyticsCall: AnalyticsCall) = cr
 @PublishedApi
 internal fun <T> createAdapter(impl: Class<T>, analyticsCall: AnalyticsCall): T {
     val serviceMethodCache = ConcurrentHashMap<Method, CallableMethod>()
-    return Proxy.newProxyInstance(impl.classLoader, arrayOf(impl)) { _: Any?, method: Method, args: Array<out Any>? ->
-        val a: Array<out Any>? =
-            if (args != null)
-                args.map(analyticsConverter).toTypedArray()
-            else null
-        val def = tryDefault(impl, method)
-        if (def != null)
-            return@newProxyInstance if (args != null)
-                def.invoke(null, null, *args)
-            else def.invoke(null, null)
+    return Proxy.newProxyInstance(impl.classLoader, arrayOf(impl), object : InvocationHandler {
+        override fun invoke(proxy: Any?, method: Method, args: Array<out Any>?): Any? {
+            val a: Array<out Any>? = args?.map(analyticsConverter)?.toTypedArray()
+            val def = tryDefault(impl, method)
+            if (def != null)
+                return if (args != null)
+                    def.invoke(this, proxy, *args)
+                else def.invoke(this, proxy)
 
-        val callableMethod = serviceMethodCache.getOrPut(method) {
-            val parameters = method.parameterAnnotations.flatMap { it.filterIsInstance(Param::class.java).map { it.value } }
-            CallableMethod(method.name, parameters)
+            val callableMethod = serviceMethodCache.getOrPut(method) {
+                val parameters = method.parameterAnnotations.flatMap { it.filterIsInstance(Param::class.java).map { it.value } }
+                CallableMethod(method.name, parameters)
+            }
+            analyticsCall.invoke(callableMethod.name, callableMethod.parameterNames, a.orEmpty().toList())
+            return null
         }
-        analyticsCall.invoke(callableMethod.name, callableMethod.parameterNames, a.orEmpty().toList())
-        null
-    } as T
+    }) as T
 }
 
 inline fun <reified T> createAggregate(vararg impls: T, noinline converter: AnalyticsConverter = { it }): T {
