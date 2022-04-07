@@ -196,37 +196,20 @@ class ExtraStarter @PublishedApi internal constructor(internal val bundle: Bundl
     fun intent(context: Context): Intent = Intent(context, clazz).putExtras(bundle)
 }
 
-val Context.start: ExtraStarter.() -> Unit
-    get() = {
-        start(this@start)
-    }
+context(Context)
+fun ExtraStarter.start() = startActivity(intent(this@Context))
 
-val Context.intent: ExtraStarter.() -> Unit
-    get() = {
-        intent(this@intent)
-    }
+context(Context)
+fun ExtraStarter.intent() = intent(this@Context)
 
-val Activity.start: ExtraStarter.() -> Unit
-    get() = {
-        start(this@start)
-    }
+context(Activity)
+fun ExtraStarter.startForResult(requestCode: Int) = startActivityForResult(intent(this@Activity), requestCode)
 
-val Activity.startForResult: ExtraStarter.(requestCode: Int) -> Unit
-    get() = { requestCode ->
-        startActivityForResult(intent(this@startForResult), requestCode, null)
-    }
+context(Fragment)
+fun ExtraStarter.start() = startActivity(intent(requireContext()))
 
-val Fragment.start: ExtraStarter.() -> Unit
-    get() = {
-        start(requireContext())
-    }
+context(Fragment)
+fun ExtraStarter.startForResult(requestCode: Int) = startActivityForResult(intent(requireContext()), requestCode)
 
-val Fragment.startForResult: ExtraStarter.(requestCode: Int) -> Unit
-    get() = { requestCode ->
-        startActivityForResult(intent(requireContext()), requestCode, null)
-    }
-
-val Fragment.intent: ExtraStarter.() -> Unit
-    get() = {
-        intent(requireContext())
-    }
+context(Fragment)
+fun ExtraStarter.intent() = intent(requireContext())
