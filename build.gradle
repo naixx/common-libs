@@ -25,7 +25,7 @@ allprojects {
 group = 'com.github.naixx.common-libs'
 
 task wrapped(type: Wrapper) {
-    gradleVersion = '7.3-rc-3'
+    gradleVersion = '7.4.2'
 }
 
 apply plugin: 'com.github.ben-manes.versions'
