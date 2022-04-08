@@ -43,5 +43,6 @@ class PrefsUnitTest {
         assertEquals(prefs.field, TestEnum.ONE)
         prefs.field = TestEnum.TWO
         assertNotEquals(prefs.field, TestEnum.ONE)
+        assertEquals(prefs.field, TestEnum.TWO)
     }
 }

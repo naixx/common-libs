@@ -28,6 +28,10 @@ android {
     }
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.freeCompilerArgs += ["-Xcontext-receivers"]
+}
+
 dependencies {
     implementation "androidx.appcompat:appcompat:$appcompat"
     implementation 'androidx.transition:transition:1.4.1'

@@ -17,51 +17,96 @@
 
 package common
 
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
-interface FragmentFlowObserveDsl : CoroutineObserveDsl {
+/**
+ * Uses view lifecycle scope
+ */
 
-    override val observeScope: CoroutineScope
-        get() = getViewLifecycleOwner().lifecycleScope
+context(V) private inline fun <V, T> Flow<T>.observeInternal(
+    crossinline onNext: suspend (T) -> Unit = {},
+    scope: CoroutineScope,
+    customContext: CoroutineContext = EmptyCoroutineContext
+): Job =
+    scope.launch(customContext) {
+        coroutineScope {
+            collect { onNext(it) }
+        }
+    }
 
-    fun getViewLifecycleOwner(): LifecycleOwner
+private inline fun launchInternal(
+    crossinline onNext: suspend () -> Unit,
+    scope: CoroutineScope,
+    customContext: CoroutineContext = EmptyCoroutineContext
+): Job = scope.launch(customContext) {
+    coroutineScope {
+        onNext()
+    }
 }
 
-interface FlowObserveDsl : CoroutineObserveDsl {
+context(LifecycleOwner)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}) = observeInternal(onNext, lifecycleScope)
 
-    override val observeScope: CoroutineScope
-        get() = getLifecycle().coroutineScope
+/**
+ * Uses view lifecycle scope
+ */
+context(Fragment)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}) = observeInternal(onNext, viewLifecycleOwner.lifecycleScope)
 
-    fun getLifecycle(): Lifecycle
-}
+context(ViewModel)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}) = observeInternal(onNext, viewModelScope)
 
-interface CoroutineObserveDsl {
+fun LifecycleOwner.launch(onNext: suspend () -> Unit): Job = launchInternal(onNext, lifecycleScope)
 
+/**
+ * Uses view lifecycle scope
+ */
+fun Fragment.launch(onNext: suspend () -> Unit): Job = launchInternal(onNext, viewLifecycleOwner.lifecycleScope)
+fun ViewModel.launch(onNext: suspend () -> Unit): Job = launchInternal(onNext, viewModelScope)
+
+//--------- error handling -----------
+
+interface CoroutineExceptionHandlerProvider {
     val exceptionHandler: CoroutineExceptionHandler
-
-    val observeScope: CoroutineScope
-
-    fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}): Job {
-        return observeScope.launch(exceptionHandler) {
-            coroutineScope {
-                this@observe.collect { onNext(it) }
-            }
-        }
-    }
-
-    fun CoroutineObserveDsl.launch(onNext: suspend () -> Unit): Job {
-        return observeScope.launch(exceptionHandler) {
-            coroutineScope {
-                onNext()
-            }
-        }
-    }
 }
 
+context(V, CoroutineExceptionHandlerProvider) private inline fun <V, T> Flow<T>.observeInternalWithExceptionHandling(
+    crossinline onNext: suspend (T) -> Unit = {},
+    scope: CoroutineScope
+): Job = observeInternal(onNext, scope, exceptionHandler)
 
+context(CoroutineExceptionHandlerProvider) private inline fun <V> V.launchInternalWithExceptionHandling(
+    crossinline onNext: suspend () -> Unit,
+    scope: CoroutineScope
+): Job = launchInternal(onNext, scope, exceptionHandler)
+
+context(ViewModel, CoroutineExceptionHandlerProvider)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}): Job = observeInternalWithExceptionHandling<ViewModel, T>(onNext, viewModelScope)
+
+context(Fragment, CoroutineExceptionHandlerProvider)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}): Job =
+    observeInternalWithExceptionHandling<Fragment, T>(onNext, viewLifecycleOwner.lifecycleScope)
+
+context(LifecycleOwner, CoroutineExceptionHandlerProvider)
+fun <T> Flow<T>.observe(onNext: suspend (T) -> Unit = {}): Job =
+    observeInternalWithExceptionHandling<LifecycleOwner, T>(onNext, lifecycleScope)
+
+context(CoroutineExceptionHandlerProvider)
+fun ViewModel.launch(onNext: suspend () -> Unit = {}): Job = launchInternalWithExceptionHandling(onNext, viewModelScope)
+
+context(CoroutineExceptionHandlerProvider)
+fun Fragment.launch(onNext: suspend () -> Unit = {}): Job =
+    launchInternalWithExceptionHandling(onNext, viewLifecycleOwner.lifecycleScope)
+
+context(CoroutineExceptionHandlerProvider)
+fun LifecycleOwner.launch(onNext: suspend () -> Unit = {}): Job =
+    launchInternalWithExceptionHandling(onNext, lifecycleScope)

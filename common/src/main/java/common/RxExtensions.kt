@@ -22,8 +22,12 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import rx.Observable
 import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
 import rx.android.schedulers.AndroidSchedulers.mainThread
 import rx.schedulers.Schedulers
 import rx.schedulers.Schedulers.io
@@ -47,12 +51,40 @@ fun <T> Observable<T>.withProgress(context: Context, cancellable: Boolean = fals
     val p = ProgressDialog(context)
     p.setCancelable(cancellable)
     return this.observeOnMain()
-            .doOnSubscribe { main.post { p.show() } }
-            .doOnTerminate { main.post { p.dismiss() } }
+        .doOnSubscribe { main.post { p.show() } }
+        .doOnTerminate { main.post { p.dismiss() } }
 }
 
 fun <T> Observable<T>.withProgress(view: View): Observable<T> {
     return this.observeOnMain()
-            .doOnSubscribe { view.post { view.visibility = View.VISIBLE } }
-            .doOnTerminate { view.post { view.visibility = View.GONE } }
+        .doOnSubscribe { view.post { view.visibility = View.VISIBLE } }
+        .doOnTerminate { view.post { view.visibility = View.GONE } }
+}
+
+interface RxObserveDsl : LifecycleOwner {
+
+    fun getContext(): Context?
+
+    fun <T> Observable<T>.withProgress(cancellable: Boolean = false) = this.withProgress(getContext()!!, cancellable)
+
+    fun <T> Observable<T>.observe(onNext: (T) -> Unit = {}): Subscription = observe(onNext, *emptyArray())
+
+    /**
+     * A convenience method to show toasts for backend api error codes. Does not respect fragment's view lifecycle
+     */
+    fun <T> Observable<T>.observe(onNext: (T) -> Unit = {}, vararg apiErrors: Pair<Int, Int>): Subscription {
+        val subscription = this
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                onNext,
+                getContext()?.handleError(*apiErrors)
+            )
+        this@RxObserveDsl.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                if (event == Lifecycle.Event.ON_DESTROY)
+                    subscription.unsubscribe()
+            }
+        })
+        return subscription
+    }
 }
