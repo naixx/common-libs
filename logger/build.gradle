@@ -16,7 +16,7 @@ android {
 
 dependencies {
     api 'com.jakewharton.timber:timber:2.2.2'
-    compileOnly 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    compileOnly "com.google.firebase:firebase-crashlytics-ktx:18.3.2"
 }
 
 apply from: "$rootDir/publish.gradle"

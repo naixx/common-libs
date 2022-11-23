@@ -19,7 +19,7 @@ package com.github.naixx.trees;
 
 import android.text.TextUtils;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -110,13 +110,13 @@ public class CrashlyticsBaseTree extends Timber.HollowTree {
     }
 
     protected void logToCrashlytics(LogLevel logLevel, String tag, String message, Throwable t) {
-        Crashlytics.getInstance().core.log(logLevel.priority, tag, message);
+        FirebaseCrashlytics.getInstance().log(logLevel.name() + " [" + tag + "] " + message);
         if (t != null) {
             String httpMessage = httpErrorMessage(t);
             if (!TextUtils.isEmpty(httpMessage)) {
-                Crashlytics.getInstance().core.log(LogLevel.ERROR.priority, tag, httpMessage);
+                FirebaseCrashlytics.getInstance().log(logLevel.name() + " [" + tag + "] " + httpMessage);
             }
-            Crashlytics.logException(t);
+            FirebaseCrashlytics.getInstance().recordException(t);
         }
     }
 
