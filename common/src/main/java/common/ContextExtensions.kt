@@ -97,20 +97,6 @@ inline fun <reified T: Activity> Fragment.startActivity(
     startActivityForResult(Intent(this.context, T::class.java).apply { block() }, requestCode, options)
 }
 
-inline fun <reified T: Activity> Activity.startActivityWithoutAnimation(
-        requestCode: Int = -1,
-        options: Bundle? = null,
-        block: Intent.() -> Unit = {}
-) {
-    startActivity<T>(requestCode, options, block)
-    overridePendingTransition(0, 0)
-}
-
-fun Activity.finishWithoutAnimation() {
-    finish()
-    overridePendingTransition(0, 0)
-}
-
 fun Activity.safelyStartIntent(intent: Intent, requestCode: Int = -1) {
     if (intent.resolveActivity(packageManager) != null) {
         when (requestCode) {

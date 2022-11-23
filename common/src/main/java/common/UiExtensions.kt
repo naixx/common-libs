@@ -75,9 +75,5 @@ fun View.beginDelayedTransition(transition: Transition? = null) = (this as? View
     TransitionManager.beginDelayedTransition(it, transition)
 }
 
-fun View.setVisible(visible: Boolean) {
-    visibility = if (visible) View.VISIBLE else View.GONE
-}
-
 fun <T : View?> Activity.bindView(resId: Int) = lazy { this.findViewById<T>(resId) }
 
