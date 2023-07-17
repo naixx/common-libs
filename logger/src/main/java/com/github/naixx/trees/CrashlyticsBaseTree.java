@@ -24,9 +24,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import timber.log.Timber;
+import timber.log.L;
 
-public abstract class CrashlyticsBaseTree extends Timber.Tree {
+public abstract class CrashlyticsBaseTree extends L.Tree {
 
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
 

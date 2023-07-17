@@ -17,11 +17,11 @@
 
 package com.github.naixx.trees;
 
-import timber.log.Timber;
+import timber.log.L;
 
 //Only for tests!
 @Deprecated
-public abstract class ConsoleTree extends Timber.Tree {
+public abstract class ConsoleTree extends L.Tree {
     @Override
     public void v(String message, Object... args) {
         System.out.println(message);

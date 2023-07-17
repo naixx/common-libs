@@ -1,11 +1,9 @@
 package com.github.naixx.trees
 
-import android.text.TextUtils
-import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import timber.log.Timber
+import timber.log.L
 
-public class CrashlyticsTree : Timber.DebugTree() {
+public class CrashlyticsTree : L.DebugTree() {
 
     private enum class LogLevel(val priority: Int) {
         VERBOSE(2), DEBUG(3), INFO(4), WARNING(5), ERROR(6)
