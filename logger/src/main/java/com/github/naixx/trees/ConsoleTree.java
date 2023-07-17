@@ -21,7 +21,7 @@ import timber.log.Timber;
 
 //Only for tests!
 @Deprecated
-public class ConsoleTree implements Timber.Tree {
+public abstract class ConsoleTree extends Timber.Tree {
     @Override
     public void v(String message, Object... args) {
         System.out.println(message);

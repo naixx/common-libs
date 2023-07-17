@@ -104,7 +104,7 @@ class TestActivity : Activity() {
 
                 TestActivity::parcelable += p
 
-                TestActivity::intArray += intArra
+               // TestActivity::intArray += intArra
                 TestActivity::serialaziable += ser
 
             }
