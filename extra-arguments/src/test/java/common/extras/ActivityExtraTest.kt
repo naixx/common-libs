@@ -108,13 +108,13 @@ class ActivityExtraTest {
         extrasUnsafe<TestActivity> {
             TestActivity::long += 3
             TestActivity::serialaziable += ParcelableData(12)
-            TestActivity::parcelable *= SerializableData()
+            //TestActivity::parcelable *= SerializableData()
         }
         doTest<TestActivity>(extras<TestActivity, SerializableData, ParcelableData> {
             TestActivity::serialaziable += SerializableData()
             TestActivity::long += 3
 
-            TestActivity::parcelable += ParcelableData(2)
+           // TestActivity::parcelable += ParcelableData(2)
         }) {
             assertEquals(ParcelableData(2), it.parcelable)
             assertEquals(ParcelableData2(2), it.parcelable2)

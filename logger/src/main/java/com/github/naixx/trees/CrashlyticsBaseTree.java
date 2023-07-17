@@ -19,16 +19,14 @@ package com.github.naixx.trees;
 
 import android.text.TextUtils;
 
+import com.github.naixx.L;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import timber.log.Timber;
-
-public class CrashlyticsBaseTree extends Timber.HollowTree {
+@Deprecated
+public abstract class CrashlyticsBaseTree extends L.Tree {
 
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
 
@@ -44,57 +42,57 @@ public class CrashlyticsBaseTree extends Timber.HollowTree {
         LogLevel(int priority) {this.priority = priority;}
     }
 
-    @Override
-    public void d(String message, Object... args) {
-        log(LogLevel.DEBUG, createTag(), formatString(message, args));
-    }
-
-    @Override
-    public void d(Throwable t, String message, Object... args) {
-        log(LogLevel.DEBUG, createTag(), formatString(message, args), t);
-    }
-
-    @Override
-    public void v(String message, Object... args) {
-    }
-
-    @Override
-    public void v(Throwable t, String message, Object... args) {
-    }
-
-    @Override
-    public void i(String message, Object... args) {
-        log(LogLevel.INFO, createTag(), formatString(message, args));
-    }
-
-    @Override
-    public void i(Throwable t, String message, Object... args) {
-        log(LogLevel.INFO, createTag(), formatString(message, args), t);
-    }
-
-    @Override
-    public void w(String message, Object... args) {
-        log(LogLevel.WARNING, createTag(), formatString(message, args));
-    }
-
-    @Override
-    public void w(Throwable t, String message, Object... args) {
-        log(LogLevel.WARNING, createTag(), formatString(message, args), t);
-    }
-
-    @Override
-    public void e(String message, Object... args) {
-        log(LogLevel.ERROR, createTag(), formatString(message, args));
-    }
-
-    @Override
-    public void e(Throwable t, String message, Object... args) {
-        //usually it is connection errors, we don't need them in logs
-        if (t instanceof UnknownHostException || t instanceof SocketTimeoutException) {
-            return;
-        }
-        logError(t, message, args);
-    }
+//    @Override
+//    public void d(String message, Object... args) {
+//        log(LogLevel.DEBUG, createTag(), formatString(message, args));
+//    }
+//
+//    @Override
+//    public void d(Throwable t, String message, Object... args) {
+//        log(LogLevel.DEBUG, createTag(), formatString(message, args), t);
+//    }
+//
+//    @Override
+//    public void v(String message, Object... args) {
+//    }
+//
+//    @Override
+//    public void v(Throwable t, String message, Object... args) {
+//    }
+//
+//    @Override
+//    public void i(String message, Object... args) {
+//        log(LogLevel.INFO, createTag(), formatString(message, args));
+//    }
+//
+//    @Override
+//    public void i(Throwable t, String message, Object... args) {
+//        log(LogLevel.INFO, createTag(), formatString(message, args), t);
+//    }
+//
+//    @Override
+//    public void w(String message, Object... args) {
+//        log(LogLevel.WARNING, createTag(), formatString(message, args));
+//    }
+//
+//    @Override
+//    public void w(Throwable t, String message, Object... args) {
+//        log(LogLevel.WARNING, createTag(), formatString(message, args), t);
+//    }
+//
+//    @Override
+//    public void e(String message, Object... args) {
+//        log(LogLevel.ERROR, createTag(), formatString(message, args));
+//    }
+//
+//    @Override
+//    public void e(Throwable t, String message, Object... args) {
+//        //usually it is connection errors, we don't need them in logs
+//        if (t instanceof UnknownHostException || t instanceof SocketTimeoutException) {
+//            return;
+//        }
+//        logError(t, message, args);
+//    }
 
     protected void logError(Throwable t, String message, Object... args) {
         log(LogLevel.ERROR, createTag(), formatString(message, args), t);
